@@ -7,4 +7,5 @@ class BaseModel(models.Model):
     isDelete = models.BooleanField(default=False)
 
     class Meta:
+        #抽象模型
         abstract = True
