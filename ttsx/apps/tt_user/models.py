@@ -14,7 +14,7 @@ class AreaInfo(models.Model):
     aparent = models.ForeignKey('self', null=True, blank=True)
 
     class Meta:
-        db_table = 'da_area'
+        db_table = 'df_area'
 
 
 class Address(models.Model):
