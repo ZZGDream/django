@@ -46,7 +46,7 @@ $(function () {
         else {
             $.get('/user/exists', {'uname': $('#user_name').val()}, function (data) {
                 if (data.result > 0) {
-                    $('#user_name').next().html('用户名已经存在').show()
+                    $('#user_name').next().html('用户名已经存在').show();
                     error_name = true;
                 } else {
                     $('#user_name').next().hide();
