@@ -7,7 +7,7 @@ from django.views.generic import View
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from django.contrib.auth import authenticate, login, logout
 from ttsx import settings
-from .models import User, Address
+from .models import User, Address, AreaInfo
 from django.http import HttpResponse
 from django_redis import get_redis_connection
 from tt_goods.models import GoodsSKU
@@ -192,6 +192,46 @@ class SiteView(LoginRequiredViewMixin, View):
             'addr_list': addr_list,
         }
         return render(request, 'user_center_site.html', context)
-    def post(self,request):
-        dict = request.POST
 
+    def post(self, request):
+        dict = request.POST
+        receiver = dict.get('receiver')
+        provice = dict.get('provice')  # 选中的option的value值
+        city = dict.get('city')
+        district = dict.get('district')
+        addr = dict.get('addr')
+        code = dict.get('email')
+        phone = dict.get('phone')
+        default = dict.get('default')
+
+        # 验证有效性
+        if not all([receiver, provice, city, district, addr, code, phone]):
+            return render(request, 'user_center_site.html', {'err_msg': '信息填写不完整'})
+        address = Address()
+        address.receiver = receiver
+        address.province_id = provice
+        address.city_id = city
+        address.district_id =district
+        address.addr = addr
+        address.code = code
+        address.phone_number = phone
+        if default:
+            address.isDefault = True
+        address.user = request.user
+        address.save()
+
+        return redirect('/user/site')
+
+
+def area(request):
+    pid = request.GET.get('pid')
+    if pid is None:
+        slist = AreaInfo.objects.filter(aparent_id__isnull=True)
+    else:
+        slist = AreaInfo.objects.filter(aparent_id=pid)
+
+
+    slist2 = []
+    for s in slist:
+        slist2.append({'id':s.id,'title':s.title})
+    return JsonResponse({'slist2':slist2})

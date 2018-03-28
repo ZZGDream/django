@@ -11,5 +11,6 @@ urlpatterns = [
     url('^info$',views.info),
     url('^order$',views.order),
     url('^site$',views.SiteView.as_view()),
+    url('^area$',views.area)
 ]
 

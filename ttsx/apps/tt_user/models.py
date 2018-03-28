@@ -21,7 +21,7 @@ class Address(models.Model):
     receiver = models.CharField(max_length=20)
     province = models.ForeignKey(AreaInfo, related_name='province')
     city = models.ForeignKey(AreaInfo, related_name='city')
-    distirct = models.ForeignKey(AreaInfo, related_name='district')
+    district = models.ForeignKey(AreaInfo, related_name='district')
     addr = models.CharField(max_length=100)
     code = models.CharField(max_length=6)
     phone_number = models.CharField(max_length=11)
