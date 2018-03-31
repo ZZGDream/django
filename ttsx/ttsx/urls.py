@@ -15,13 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-
+import haystack.urls
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url('^user/',include('tt_user.urls')),
     url('^',include('tt_goods.urls')),
     url('^order/',include('tt_order.urls')),
     url('^cart/',include('tt_cart.urls')),
-    url(r'^tinymce/',include('tinymce.urls'))
-
+    url(r'^tinymce/',include('tinymce.urls')),
+    # url(r'^search/',include(haystack.urls))
 ]

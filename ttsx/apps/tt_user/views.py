@@ -166,6 +166,7 @@ def info(request):
         address = None
 
     redis_client = get_redis_connection()
+    #redis中存放的商品编号
     gid_list = redis_client.lrange('history%d' % request.user.id, 0, -1)
     goods_list = []
     for gid in gid_list:

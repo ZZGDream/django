@@ -10,6 +10,7 @@ class FdfsStorage(Storage):
         buffer = content.read()
         # 根据配置文件创建的客户端的实例对象
         client = Fdfs_client(settings.FDFS_CLIENT)
+        client = Fdfs_client()
         # 上传文件数据
         try:
             result = client.upload_by_buffer(buffer)

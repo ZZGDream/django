@@ -1,6 +1,7 @@
 from django.db import models
 from utils.models import BaseModel
-from tinymce.models import HTMLField#富文本编辑器
+from tinymce.models import HTMLField  # 富文本编辑器
+
 
 class GoodsCategory(BaseModel):
     """商品类别表"""

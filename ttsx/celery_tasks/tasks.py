@@ -4,7 +4,6 @@ from django.core.mail import send_mail
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, SignatureExpired
 from celery import Celery
 from django.conf import settings
-
 import os,django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',"ttsx.settings")
 
