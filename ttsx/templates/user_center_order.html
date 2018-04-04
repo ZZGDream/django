@@ -1,21 +1,14 @@
-{% extends 'base_top.html' %}
+{% extends 'base_user.html' %}
 
-{% block body1 %}
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
-		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
-		<div class="search_con fr">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>		
-	</div>
+{% block body2 %}
+
 
 	<div class="main_con clearfix">
 		<div class="left_menu_con clearfix">
 			<h3>用户中心</h3>
 			<ul>
 				<li><a href="/user/info">· 个人信息</a></li>
-				<li><a href="#" class="active">· 全部订单</a></li>
+				<li><a href="/user/order" class="active">· 全部订单</a></li>
 				<li><a href="/user/site">· 收货地址</a></li>
 			</ul>
 		</div>
@@ -91,7 +84,7 @@
 				</div>
 		</div>
 	</div>
-{% endblock body1 %}
+{% endblock body2 %}
 
 
 

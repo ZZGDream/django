@@ -5,6 +5,7 @@ from django.core.paginator import Page, Paginator
 from .models import GoodsCategory, IndexGoodsBanner, IndexPromotionBanner, IndexCategoryGoodsBanner, GoodsSKU
 from utils.page_list import get_page_list
 from haystack.generic_views import SearchView
+import json
 
 
 # from haystack.generic_views import SearchView
@@ -34,7 +35,8 @@ def index(request):
         'title': '首页',
         'category_list': category_list,
         'banner_list': banner_list,
-        'adv_list': adv_list
+        'adv_list': adv_list,
+        'total_count': get_cart_total(request)
     }
     return render(request, 'index.html', context)
     # html = response.content.decode()
@@ -68,7 +70,8 @@ def detail(request, sku_id):
         'sku': sku,
         'category_list': category_list,
         'new_list': new_list,
-        'other_list': other_list
+        'other_list': other_list,
+        'total_count': get_cart_total(request)
     }
     return render(request, 'detail.html', context)
 
@@ -112,13 +115,18 @@ def list_sku(request, category_id):
         'category_list': category_list,
         'order': order,
         # 页数的列表
-        'page_list': get_page_list(total_page, pindex)
+        'page_list': get_page_list(total_page, pindex),
+        'total_count': get_cart_total(request)
     }
     return render(request, 'list.html', context)
 
 
 # 自定义上下文
 class MySearchView(SearchView):
+    def get(self, request, *args, **kwargs):
+        self.curr_request = request
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         category_list = GoodsCategory.objects.all()
@@ -127,5 +135,24 @@ class MySearchView(SearchView):
         # do something
         context['title'] = '搜索结果'
         context['category_list'] = category_list
-        context['page_list']=get_page_list(total_page,pindex)
+        context['page_list'] = get_page_list(total_page, pindex)
+        context['total_count'] = get_cart_total(self.curr_request)
         return context
+
+
+def get_cart_total(request):
+    total_count = 0
+    if request.user.is_authenticated():
+        redis_client = get_redis_connection()
+        key = 'cart%d' % request.user.id
+        for v in redis_client.hvals(key):
+            total_count += int(v)
+    else:
+        cart_str = request.COOKIES.get('cart')
+        if cart_str:
+            # 将字符串转化为字典用loads
+            cart_dict = json.loads(cart_str)
+            for k, v in cart_dict.items():
+                total_count += v
+
+    return total_count

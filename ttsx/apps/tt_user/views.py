@@ -13,6 +13,7 @@ from django_redis import get_redis_connection
 from tt_goods.models import GoodsSKU
 from celery_tasks.tasks import send_user_active
 from utils.views import LoginRequiredViewMixin
+import json
 
 
 # Create your views here.
@@ -138,15 +139,31 @@ class LoginView(View):
 
         # 状态保持
         login(request, user)
-
-        response = redirect('/user/info')
+        next_url = request.GET.get('next','/user/info')
+        response = redirect(next_url)
 
         # 记住用户名
         if remember is None:
             response.delete_cookie('uname')
         else:
             response.set_cookie('uname', uname, expires=60 * 60 * 24 * 7)
-
+        # 读取cookie中的购物车信息
+        cart_str = request.COOKIES.get('cart')
+        if cart_str:
+            # 构建一个可以唯一识别的键
+            key = 'cart%d' % request.user.id
+            redis_client = get_redis_connection()
+            # 将字符串转化为字典
+            cart_dict = json.loads(cart_str)
+            for k, v in cart_dict.items():
+                if redis_client.hexists(key, k):
+                    count1 = int(redis_client.hget(key, k))
+                    count0 = v
+                    count = count1 + count0
+                    redis_client.hset(key, k, count)
+                else:
+                    redis_client.hset(key, k, v)
+            response.delete_cookie('cart')
         # 如果登录成功则转到用户中心页面
         return redirect('/user/info')
 
@@ -166,7 +183,7 @@ def info(request):
         address = None
 
     redis_client = get_redis_connection()
-    #redis中存放的商品编号
+    # redis中存放的商品编号
     gid_list = redis_client.lrange('history%d' % request.user.id, 0, -1)
     goods_list = []
     for gid in gid_list:
@@ -212,7 +229,7 @@ class SiteView(LoginRequiredViewMixin, View):
         address.receiver = receiver
         address.province_id = provice
         address.city_id = city
-        address.district_id =district
+        address.district_id = district
         address.addr = addr
         address.code = code
         address.phone_number = phone
@@ -231,8 +248,7 @@ def area(request):
     else:
         slist = AreaInfo.objects.filter(aparent_id=pid)
 
-
     slist2 = []
     for s in slist:
-        slist2.append({'id':s.id,'title':s.title})
-    return JsonResponse({'slist2':slist2})
+        slist2.append({'id': s.id, 'title': s.title})
+    return JsonResponse({'slist2': slist2})

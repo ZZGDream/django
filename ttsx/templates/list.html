@@ -1,5 +1,7 @@
 {% extends 'base_goods.html' %}
-
+{% block head %}
+<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+{% endblock head %}
 {% block body3 %}
     <div class="navbar_con">
         <div class="navbar clearfix">
@@ -67,7 +69,7 @@
                     <div class="operate">
                         <span class="prize">￥{{ sku.price }}</span>
                         <span class="unit">{{ sku.price }}/{{ sku.unit }}</span>
-                        <a href="#" class="add_goods" title="加入购物车"></a>
+                        <a href="javascript:;" class="add_goods" id="{{ sku.id }}" title="加入购物车"></a>
                     </div>
                 </li>
                 {% endfor %}
@@ -102,5 +104,19 @@
             </div>
         </div>
     </div>
+    <script>
+        $('.add_goods').click(function () {
+            $.post('/cart/add',{
+                'sku_id':$(this).attr('id'),
+                'count':1,
+                'csrfmiddlewaretoken':'{{ csrf_token }}',
+            },function (data) {
+                if(data.status ==1){
+                    alert('添加成功')
+                    $('#show_count').html(data.total_count)
+                }
+            })
+        })
+    </script>
 
 {% endblock body3 %}
